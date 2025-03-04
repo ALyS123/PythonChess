@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pieces import wP, bP, wR, bR, wKnight, bKnight, wB, bB, wQ, bQ, wK, bK
+from tile_center_position import tile_center_position
 
 #initialize pygame
 pygame.init()
@@ -31,30 +32,6 @@ board_state = [
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 
                        ]
 
-"""board_state = [
-    2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
-    2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
-    0 , 2 , 2 , 2 , 2 , 2 , 2 , 0 ,
-    0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
-    0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
-    0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
-    1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
-    1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 
-                       ]"""
-
-
-#(x,y) coordinates of the white pieces (x = columns , y = rows)
-tile_center_position = [
-    [130,80]  , [210,80]  ,  [290,80] ,  [370,80] ,  [450,80] ,  [530,80] ,  [610,80] ,  [690,80] ,
-    [130,160] , [210,160] , [290,160] , [370,160] , [450,160] , [530,160] , [610,160] , [690,160] ,
-    [130,240] , [210,240] , [290,240] , [370,240] , [450,240] , [530,240] , [610,240] , [690,240] ,
-    [130,320] , [210,320] , [290,320] , [370,320] , [450,320] , [530,320] , [610,320] , [690,320] ,
-    [130,400] , [210,400] , [290,400] , [370,400] , [450,400] , [530,400] , [610,400] , [690,400] ,
-    [130,480] , [210,480] , [290,480] , [370,480] , [450,480] , [530,480] , [610,480] , [690,480] ,
-    [130,560] , [210,560] , [290,560] , [370,560] , [450,560] , [530,560] , [610,560] , [690,560] ,
-    [130,640] , [210,640] , [290,640] , [370,640] , [450,640] , [530,640] , [610,640] , [690,640]                         
-                        ]
-#uncomment it when the game is ready to be played
 
 # the game in string format stored in the list                          
 board_pieces = [
@@ -68,17 +45,10 @@ board_pieces = [
     "wR" , "wKnight" , "wB" , "wQ" , "wK" , "wB" , "wKnight" , "wR" 
     ]
 
+white = ["wP" , "wR" , "wKnight" , "wB" , "wQ" , "wK"]
+black = ["bP" , "bR" , "bKnight" , "bB" , "bQ" , "bK"]
 
-"""board_pieces = [
-    "bR" , "bKnight" , "bB" , "bQ" , "bK" , "bB" , "bKnight" , "bR" ,                      
-    "bP" ,    "bP"   , "bP" , "bP" , "bP" , "bP" ,    "bP"   , "bP" ,
-    "0"  ,     "bP"   ,  "bP" ,  "bP" ,  "bP" ,  "bP" ,     "bP"   ,  "0" ,
-    "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "wB" ,    "wB"   , "wB" , "wB" , "wB" , "wB" ,    "wB"   , "wB" ,
-    "wB" , "wB" , "wB" , "wQ" , "wK" , "wB" , "wKnight" , "wR" 
-    ]"""
+
 
 # Create window
 def create_window():
@@ -142,11 +112,15 @@ def user_click_position(position):
         index = row * COLS + col  # Calculate the index based on row-major order
         print(f"Mouse clicked at: ({position[0]}, {position[1]}), Index: {index}")
         return index
-    
+
+
+
+# needs to be modified 
 def pieces_movement(user_first_click,user_second_click,test):
     #variable user_first_click stores users first click
     #variable user_second_click stores user second click
     #availabe_position stores the vector of availabe positions
+    
     if int(user_second_click) in test:
         board_pieces[user_second_click] = board_pieces[user_first_click]
         board_pieces[user_first_click] = "0"
@@ -154,6 +128,7 @@ def pieces_movement(user_first_click,user_second_click,test):
         board_state[user_first_click] = 0
         draw_board()
         draw_pieces()
+        
     else:
         return
 
@@ -163,6 +138,7 @@ def pieces_movement(user_first_click,user_second_click,test):
 
 
 def highlight_square(index1):
+    
     posibble_moves = []
     global highlighted_square
     draw_board()
@@ -175,8 +151,47 @@ def highlight_square(index1):
     highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
     screen.blit(highlight_surface, (x, y))
 
-    #jandkja
-    if board_pieces[index1] == "wP" and index1 in range(48, 56):
+
+    # this will allow me to use the highlight algorithm without having to copy it for differet collor
+    if board_pieces[index1] in white:
+        color = white
+        var = board_pieces[index1]
+        ally = 1
+        enemy = 2
+    elif board_pieces[index1] in black:
+        var = board_pieces[index1]
+        color = black
+        ally = 2
+        enemy = 1
+    else:
+        posibble_moves.append(-1)
+        return posibble_moves
+
+
+    if var == "bP" and index1 in range(8, 16):  # "bP" first move    
+        highlight_surface.fill((255, 255, 0, 100))
+        for step in (8, 16):  # Move 1 step (8) and 2 steps (16)
+            if board_state[index1 + step]:  # Check if the target square is occupied
+                break
+            target_index = index1 + step
+            row, col = divmod(target_index, COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(target_index)
+        return posibble_moves
+
+
+    elif var == "bP": #board_pieces[index1] == var:#"bP"
+        if index1 + 8 <= 63 and (board_state[index1 + 8] != ally):
+            row, col = divmod(index1 + 8 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 + 8)
+        return posibble_moves
+
+    elif var == "wP" and index1 in range(48, 56):#"wP"
         #print("wP can move 2 steps") pawn first move
 
         #highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
@@ -195,8 +210,8 @@ def highlight_square(index1):
         return posibble_moves
 
     #adawd
-    elif board_pieces[index1] == "wP":
-        if index1 - 8 >= 0 and (board_state[index1 - 8] != 1):
+    elif var == "wP": #board_pieces[index1] == var:#"wP"
+        if index1 - 8 >= 0 and (board_state[index1 - 8] != ally):
             row, col = divmod(index1 - 8 , COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -205,14 +220,14 @@ def highlight_square(index1):
         return posibble_moves
     
     #Rook movement +y-y///+x-x
-    elif board_pieces[index1] == "wR":
+    elif var == "wR" or var == "bR": #board_pieces[index1] == var:#"wR"
         num = 8
         positive_y = index1
         while positive_y >= 0 and (positive_y - 8 >= 0):
             positive_y -= num
-            if board_state[positive_y] == 1:
+            if board_state[positive_y] == ally:
                 break
-            if board_state[positive_y] == 2:
+            if board_state[positive_y] == enemy:
                 row, col = divmod(positive_y, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -233,9 +248,9 @@ def highlight_square(index1):
         negative_y = index1
         while negative_y < 64 and (negative_y + 8 < 64):
             negative_y += num
-            if board_state[negative_y] == 1:
+            if board_state[negative_y] == ally:
                 break
-            if board_state[negative_y] == 2:
+            if board_state[negative_y] == enemy:
                 row, col = divmod(negative_y, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -257,9 +272,9 @@ def highlight_square(index1):
         upper_bound = (positive_x // 8) * 8 + 7
         start_value = positive_x + 1
         for i in range(start_value, upper_bound + 1):
-            if board_state[i] == 1:
+            if board_state[i] == ally:
                 break
-            if board_state[i] == 2:
+            if board_state[i] == enemy:
                 row, col = divmod(i, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -280,9 +295,9 @@ def highlight_square(index1):
         lower_bound = (negative_x // 8) * 8 
         start_value = negative_x - 1
         for i in range(start_value, lower_bound - 1, -1):
-            if board_state[i] == 1:
+            if board_state[i] == ally:
                 break
-            if board_state[i] == 2:
+            if board_state[i] == enemy:
                 row, col = divmod(i, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -302,9 +317,9 @@ def highlight_square(index1):
         return posibble_moves
 
     #knight movement
-    elif board_pieces[index1] == "wKnight":
+    elif var == "wKnight" or var == "bKnight":#board_pieces[index1] == var:#"wKnight"
         far_right_up = index1 - 6
-        if (far_right_up >= 0) and ((index1 // 8) != (far_right_up // 8)) and (board_state[far_right_up] != 1):
+        if (far_right_up >= 0) and ((index1 // 8) != (far_right_up // 8)) and (board_state[far_right_up] != ally):
             row, col = divmod(far_right_up, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -314,7 +329,7 @@ def highlight_square(index1):
             posibble_moves.append(far_right_up)
 
         mid_up_right = index1 - 15
-        if (mid_up_right >= 0) and ((index1 // 8) >= (mid_up_right // 8) + 2) and (board_state[mid_up_right] != 1):
+        if (mid_up_right >= 0) and ((index1 // 8) >= (mid_up_right // 8) + 2) and (board_state[mid_up_right] != ally):
             row, col = divmod(mid_up_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -325,7 +340,7 @@ def highlight_square(index1):
 
         mid_up_left = index1 - 17
         not_allowed_positions = [24,32,40,48,56]
-        if((mid_up_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_up_left] != 1)):
+        if((mid_up_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_up_left] != ally)):
             row, col = divmod(mid_up_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -341,7 +356,7 @@ def highlight_square(index1):
             32,33,40,
             41,48,49,56,57
             ]
-        if((far_left_up >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_up] != 1)):
+        if((far_left_up >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_up] != ally)):
             row, col = divmod(far_left_up, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -357,7 +372,7 @@ def highlight_square(index1):
             57,58,59,60,61,62,63
             ]
         
-        if((far_left_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_down] != 1)):
+        if((far_left_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_down] != ally)):
             row, col = divmod(far_left_down, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -373,7 +388,7 @@ def highlight_square(index1):
             54,55,57,58,59,60,
             61,62,63
         ] 
-        if((mid_down_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_left] != 1)):
+        if((mid_down_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_left] != ally)):
             row, col = divmod(mid_down_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -391,7 +406,7 @@ def highlight_square(index1):
             61,62,63
         ] 
 
-        if((mid_down_right >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_right] != 1)):
+        if((mid_down_right >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_right] != ally)):
             row, col = divmod(mid_down_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -406,7 +421,7 @@ def highlight_square(index1):
             46,47,54,55,56,57,58,59,60,
             61,62,63
         ]
-        if((far_right_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_right_down] != 1)):
+        if((far_right_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_right_down] != ally)):
             row, col = divmod(far_right_down, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -420,11 +435,11 @@ def highlight_square(index1):
         return posibble_moves
     
     #bishop movement
-    elif board_pieces[index1] == "wB":
+    elif var == "wB" or var == "bB": # board_pieces[index1] == var:#"wB"
         top_right = index1 - 7
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
-        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != 1)):
+        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
             row, col = divmod(top_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -433,7 +448,7 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(top_right)
 
-            if board_state[top_right] == 2 and board_state[top_right - 7] == 2 or (board_state[top_right] == 2):
+            if board_state[top_right] == enemy:
                 break
             top_right -= 7
 
@@ -441,7 +456,7 @@ def highlight_square(index1):
         top_left = index1 - 9
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
-        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != 1)):
+        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
             row, col = divmod(top_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -450,7 +465,7 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(top_left)
 
-            if board_state[top_left] == 2 and board_state[top_left - 9] == 2 or (board_state[top_left] == 2):
+            if board_state[top_left] == enemy:
                 break
             top_left -= 9
 
@@ -458,7 +473,7 @@ def highlight_square(index1):
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
-        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != 1)):
+        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
             row, col = divmod(bottom_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -467,13 +482,15 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(bottom_left)
 
-            if (board_state[bottom_left] == 2 and board_state[bottom_left + 7] == 2) or (board_state[bottom_left] == 2):
+            if board_state[bottom_left] == enemy:
                 break
             bottom_left += 7
 
+
+        # this is what is breaking the program
         bottom_right = index1 + 9
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != 1)):
+        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
             row, col = divmod(bottom_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -482,17 +499,18 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(bottom_right)
 
-            if board_state[bottom_right] == 2 and board_state[bottom_right + 9] == 2 or (board_state[bottom_right] == 2):
+            if(board_state[bottom_right] == enemy):
                 break
+
             bottom_right += 9
 
     #queen movement
-    elif board_pieces[index1] == "wQ":
+    elif var == "wQ" or var == "bQ":#board_pieces[index1] == var:#"wQ"
 
         top_right = index1 - 7
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
-        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != 1)):
+        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
             row, col = divmod(top_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -501,7 +519,7 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(top_right)
 
-            if board_state[top_right] == 2 and board_state[top_right - 7] == 2 or (board_state[top_right] == 2):
+            if board_state[top_right] == enemy:
                 break
             top_right -= 7
 
@@ -509,7 +527,7 @@ def highlight_square(index1):
         top_left = index1 - 9
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
-        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != 1)):
+        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
             row, col = divmod(top_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -518,7 +536,7 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(top_left)
 
-            if board_state[top_left] == 2 and board_state[top_left - 9] == 2 or (board_state[top_left] == 2):
+            if board_state[top_left] == enemy:
                 break
             top_left -= 9
 
@@ -526,7 +544,7 @@ def highlight_square(index1):
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
-        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != 1)):
+        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
             row, col = divmod(bottom_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -535,13 +553,13 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(bottom_left)
 
-            if (board_state[bottom_left] == 2 and board_state[bottom_left + 7] == 2) or (board_state[bottom_left] == 2):
+            if board_state[bottom_left] == enemy:
                 break
             bottom_left += 7
 
         bottom_right = index1 + 9
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != 1)):
+        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
             row, col = divmod(bottom_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -550,7 +568,7 @@ def highlight_square(index1):
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(bottom_right)
 
-            if board_state[bottom_right] == 2 and board_state[bottom_right + 9] == 2 or (board_state[bottom_right] == 2):
+            if board_state[bottom_right] == enemy:
                 break
             bottom_right += 9
 
@@ -559,9 +577,9 @@ def highlight_square(index1):
         positive_y = index1
         while positive_y >= 0 and (positive_y - 8 >= 0):
             positive_y -= num
-            if board_state[positive_y] == 1:
+            if board_state[positive_y] == ally:
                 break
-            if board_state[positive_y] == 2:
+            if board_state[positive_y] == enemy:
                 row, col = divmod(positive_y, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -582,9 +600,9 @@ def highlight_square(index1):
         negative_y = index1
         while negative_y < 64 and (negative_y + 8 < 64):
             negative_y += num
-            if board_state[negative_y] == 1:
+            if board_state[negative_y] == ally:
                 break
-            if board_state[negative_y] == 2:
+            if board_state[negative_y] == enemy:
                 row, col = divmod(negative_y, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -606,9 +624,9 @@ def highlight_square(index1):
         upper_bound = (positive_x // 8) * 8 + 7
         start_value = positive_x + 1
         for i in range(start_value, upper_bound + 1):
-            if board_state[i] == 1:
+            if board_state[i] == ally:
                 break
-            if board_state[i] == 2:
+            if board_state[i] == enemy:
                 row, col = divmod(i, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -629,9 +647,9 @@ def highlight_square(index1):
         lower_bound = (negative_x // 8) * 8 
         start_value = negative_x - 1
         for i in range(start_value, lower_bound - 1, -1):
-            if board_state[i] == 1:
+            if board_state[i] == ally:
                 break
-            if board_state[i] == 2:
+            if board_state[i] == enemy:
                 row, col = divmod(i, COLS)
                 x = MARGIN_X + col * SQUARE_SIZE
                 y = MARGIN_Y + row * SQUARE_SIZE
@@ -651,11 +669,11 @@ def highlight_square(index1):
         return posibble_moves
     
     #king movement
-    elif board_pieces[index1] == "wK":
+    elif var == "wK" or var == "bK":#board_pieces[index1] == var:#"wK"
 
         top = index1 - 8
         not_allowed_positions = [0,1,2,3,4,5,6,7]
-        if(board_state[top] != 1) and (index1 not in not_allowed_positions):
+        if(board_state[top] != ally) and (index1 not in not_allowed_positions):
             row, col = divmod(top, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -666,7 +684,7 @@ def highlight_square(index1):
 
         top_left = index1 - 9
         not_allowed_positions = [0,1,2,3,4,5,6,7,8,16,24,32,40,48, 56]
-        if (board_state[top_left] != 1) and (index1 not in not_allowed_positions):
+        if (board_state[top_left] != ally) and (index1 not in not_allowed_positions):
             row, col = divmod(top_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -677,7 +695,7 @@ def highlight_square(index1):
 
         left = index1 - 1
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
-        if (board_state[left] != 1) and (index1 not in not_allowed_positions):
+        if (board_state[left] != ally) and (index1 not in not_allowed_positions):
             row, col = divmod(left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -688,7 +706,7 @@ def highlight_square(index1):
 
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48, 56,57,58,59,60,61,62,63]
-        if(bottom_left <= 63) and (board_state[bottom_left] != 1) and (index1 not in not_allowed_positions) :
+        if(bottom_left <= 63) and (board_state[bottom_left] != ally) and (index1 not in not_allowed_positions) :
             row, col = divmod(bottom_left, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -699,7 +717,7 @@ def highlight_square(index1):
 
         bottom = index1 + 8
         not_allowed_positions = [56,57,58,59,60,61,62,63]
-        if(bottom <= 63) and (board_state[bottom] != 1) and (index1 not in not_allowed_positions) :
+        if(bottom <= 63) and (board_state[bottom] != ally) and (index1 not in not_allowed_positions) :
             row, col = divmod(bottom, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -710,7 +728,7 @@ def highlight_square(index1):
 
         bottom_right = index1 + 9
         not_allowed_positions = [56,57,58,59,60,61,62,63,7,15,23,31,39,47,55]
-        if(bottom_right <= 63) and (board_state[bottom_right] != 1) and (index1 not in not_allowed_positions) :
+        if(bottom_right <= 63) and (board_state[bottom_right] != ally) and (index1 not in not_allowed_positions) :
             row, col = divmod(bottom_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -721,7 +739,7 @@ def highlight_square(index1):
 
         right = index1 + 1
         not_allowed_positions = [63,7,15,23,31,39,47,55]
-        if(right <= 63) and (board_state[right] != 1) and (index1 not in not_allowed_positions) :
+        if(right <= 63) and (board_state[right] != ally) and (index1 not in not_allowed_positions) :
             row, col = divmod(right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
@@ -732,7 +750,7 @@ def highlight_square(index1):
 
         top_right = index1 - 7
         not_allowed_positions = [63,7,15,23,31,39,47,55,0,1,2,3,4,5,6,7]
-        if(top_right >= 0) and (board_state[top_right] != 1) and (index1 not in not_allowed_positions) :
+        if(top_right >= 0) and (board_state[top_right] != ally) and (index1 not in not_allowed_positions) :
             row, col = divmod(top_right, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
