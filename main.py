@@ -66,7 +66,8 @@ def draw_board():
             y = MARGIN_Y + row * SQUARE_SIZE
             pygame.draw.rect(screen, color, (x, y, SQUARE_SIZE, SQUARE_SIZE))
 
-"""draws pieces on the board iterates through the list of pieces and draws them on the board, using the x and y coordinates of the pieces
+"""draws pieces on the board iterates through the list of pieces and draws them on the board, 
+using the x and y coordinates of the pieces
 that are stored in another list called tile_center_position"""
 def draw_pieces():
     for i in range(64):
