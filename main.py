@@ -27,7 +27,7 @@ board_state = [
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
-    0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
+    2 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 
                        ]
@@ -40,7 +40,7 @@ board_pieces = [
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
+    "bP"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "wP" ,    "wP"   , "wP" , "wP" , "wP" , "wP" ,    "wP"   , "wP" ,
     "wR" , "wKnight" , "wB" , "wQ" , "wK" , "wB" , "wKnight" , "wR" 
     ]
@@ -168,56 +168,154 @@ def highlight_square(index1):
         return posibble_moves
 
 
+
+
     if var == "bP" and index1 in range(8, 16):  # "bP" first move    
         highlight_surface.fill((255, 255, 0, 100))
         for step in (8, 16):  # Move 1 step (8) and 2 steps (16)
             if board_state[index1 + step]:  # Check if the target square is occupied
                 break
             target_index = index1 + step
+
             row, col = divmod(target_index, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(target_index)
+
+        not_allowed_positions = [0,8,16,24,32,40,48,56]
+        if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 + 7 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            
+            posibble_moves.append(index1 + 7)
+
+        not_allowed_positions = [7,15,23,31,39,47,55,63]
+        if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 + 9 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 + 9)
+
+
+
         return posibble_moves
 
 
     elif var == "bP": #board_pieces[index1] == var:#"bP"
-        if index1 + 8 <= 63 and (board_state[index1 + 8] != ally):
+        if (index1 + 8 <= 63) and (board_state[index1 + 8] != ally) and (board_state[index1 + 8] != enemy):
+
             row, col = divmod(index1 + 8 , COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
             screen.blit(highlight_surface, (x, y))
+
             posibble_moves.append(index1 + 8)
+        
+        not_allowed_positions = [0,8,16,24,32,40,48,56]
+        if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 + 7 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+
+            posibble_moves.append(index1 + 7)
+
+        not_allowed_positions = [7,15,23,31,39,47,55,63]
+        if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 + 9 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 + 9)
+
+
         return posibble_moves
 
-    elif var == "wP" and index1 in range(48, 56):#"wP"
-        #print("wP can move 2 steps") pawn first move
 
-        #highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
+
+
+    elif var == "wP" and index1 in range(48, 56):#"wP"
         highlight_surface.fill((255, 255, 0, 100))
 
         #this algorthim will highlight the first posible move for each pawn.
         for step in (8, 16):  # Move 1 step (8) and 2 steps (16)
             if board_state[index1 - step]:
                 break
+
+
             target_index = index1 - step
             row, col = divmod(target_index, COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(target_index)
+
+        not_allowed_positions = [7,15,23,31,39,47,55,63]
+        if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 - 7 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 - 7)
+
+        not_allowed_positions = [0,8,16,24,32,40,48,56]
+        if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 - 9 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 - 9)
+
         return posibble_moves
 
     #adawd
     elif var == "wP": #board_pieces[index1] == var:#"wP"
-        if index1 - 8 >= 0 and (board_state[index1 - 8] != ally):
+        if index1 - 8 >= 0 and (board_state[index1 - 8] != ally) and (board_state[index1 - 8] != enemy):
             row, col = divmod(index1 - 8 , COLS)
             x = MARGIN_X + col * SQUARE_SIZE
             y = MARGIN_Y + row * SQUARE_SIZE
             screen.blit(highlight_surface, (x, y))
             posibble_moves.append(index1 - 8)
+
+        
+        not_allowed_positions = [7,15,23,31,39,47,55,63]
+        if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 - 7 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 - 7)
+
+        not_allowed_positions = [0,8,16,24,32,40,48,56]
+        if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions):
+            
+            row, col = divmod(index1 - 9 , COLS)
+            x = MARGIN_X + col * SQUARE_SIZE
+            y = MARGIN_Y + row * SQUARE_SIZE
+            screen.blit(highlight_surface, (x, y))
+            posibble_moves.append(index1 - 9)
+
         return posibble_moves
+    
+
+    
+
+        
+
+
+
+
     
     #Rook movement +y-y///+x-x
     elif var == "wR" or var == "bR": #board_pieces[index1] == var:#"wR"
