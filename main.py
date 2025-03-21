@@ -12,7 +12,7 @@ ROWS, COLS = 8, 8
 SQUARE_SIZE = BOARD_SIZE // COLS
 MARGIN_X = (WINDOW_WIDTH - BOARD_SIZE) // 2
 MARGIN_Y = (WINDOW_HEIGHT - BOARD_SIZE) // 2
-highlighted_square = -1 
+
 
 # Colors
 WHITE = (240, 217, 181)
@@ -27,10 +27,9 @@ board_state = [
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
-    2 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
+    0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
-    1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 
-                       ]
+    1 , 1 , 1 , 1 , 1 , 1 , 1 , 1  ]
 
 
 # the game in string format stored in the list                          
@@ -40,7 +39,7 @@ board_pieces = [
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "bP"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
+    "0" ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0"  ,
     "wP" ,    "wP"   , "wP" , "wP" , "wP" , "wP" ,    "wP"   , "wP" ,
     "wR" , "wKnight" , "wB" , "wQ" , "wK" , "wB" , "wKnight" , "wR" 
     ]
@@ -48,7 +47,13 @@ board_pieces = [
 white = ["wP" , "wR" , "wKnight" , "wB" , "wQ" , "wK"]
 black = ["bP" , "bR" , "bKnight" , "bB" , "bQ" , "bK"]
 
-
+def highlighted_tile_color_position(index1):
+    row, col = divmod(index1, COLS)
+    x = MARGIN_X + col * SQUARE_SIZE
+    y = MARGIN_Y + row * SQUARE_SIZE
+    highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
+    highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
+    screen.blit(highlight_surface, (x, y))
 
 # Create window
 def create_window():
@@ -115,7 +120,6 @@ def user_click_position(position):
         return index
 
 
-
 # needs to be modified 
 def pieces_movement(user_first_click,user_second_click,test):
     #variable user_first_click stores users first click
@@ -130,80 +134,51 @@ def pieces_movement(user_first_click,user_second_click,test):
         draw_board()
         draw_pieces()
         
-    else:
-        return
-
-
-
-
 
 
 def highlight_square(index1):
     
     posibble_moves = []
-    global highlighted_square
+    #global highlighted_square
     draw_board()
     draw_pieces()
-
-    row, col = divmod(index1, COLS)
-    x = MARGIN_X + col * SQUARE_SIZE
-    y = MARGIN_Y + row * SQUARE_SIZE
-    highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-    highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-    screen.blit(highlight_surface, (x, y))
+    highlighted_tile_color_position(index1)
 
 
     # this will allow me to use the highlight algorithm without having to copy it for differet collor
     if board_pieces[index1] in white:
-        color = white
         var = board_pieces[index1]
         ally = 1
         enemy = 2
     elif board_pieces[index1] in black:
         var = board_pieces[index1]
-        color = black
         ally = 2
         enemy = 1
+
     else:
         posibble_moves.append(-1)
         return posibble_moves
 
-
-
-
     if var == "bP" and index1 in range(8, 16):  # "bP" first move    
-        highlight_surface.fill((255, 255, 0, 100))
         for step in (8, 16):  # Move 1 step (8) and 2 steps (16)
             if board_state[index1 + step]:  # Check if the target square is occupied
                 break
             target_index = index1 + step
 
-            row, col = divmod(target_index, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(target_index)
             posibble_moves.append(target_index)
 
         not_allowed_positions = [0,8,16,24,32,40,48,56]
         if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 + 7 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
-            
+            highlighted_tile_color_position(index1 + 7)
             posibble_moves.append(index1 + 7)
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 + 9 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 + 9)
             posibble_moves.append(index1 + 9)
-
-
 
         return posibble_moves
 
@@ -211,70 +186,43 @@ def highlight_square(index1):
     elif var == "bP": #board_pieces[index1] == var:#"bP"
         if (index1 + 8 <= 63) and (board_state[index1 + 8] != ally) and (board_state[index1 + 8] != enemy):
 
-            row, col = divmod(index1 + 8 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
-
+            highlighted_tile_color_position(index1 + 8)
             posibble_moves.append(index1 + 8)
         
         not_allowed_positions = [0,8,16,24,32,40,48,56]
         if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 + 7 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
-
+            highlighted_tile_color_position(index1 + 7)
             posibble_moves.append(index1 + 7)
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 + 9 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 + 9)
+
             posibble_moves.append(index1 + 9)
-
-
         return posibble_moves
 
-
-
-
     elif var == "wP" and index1 in range(48, 56):#"wP"
-        highlight_surface.fill((255, 255, 0, 100))
-
         #this algorthim will highlight the first posible move for each pawn.
         for step in (8, 16):  # Move 1 step (8) and 2 steps (16)
             if board_state[index1 - step]:
                 break
 
-
             target_index = index1 - step
-            row, col = divmod(target_index, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(target_index)
             posibble_moves.append(target_index)
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 - 7 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 - 7)
             posibble_moves.append(index1 - 7)
 
         not_allowed_positions = [0,8,16,24,32,40,48,56]
         if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 - 9 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 - 9)
             posibble_moves.append(index1 - 9)
 
         return posibble_moves
@@ -282,42 +230,25 @@ def highlight_square(index1):
     #adawd
     elif var == "wP": #board_pieces[index1] == var:#"wP"
         if index1 - 8 >= 0 and (board_state[index1 - 8] != ally) and (board_state[index1 - 8] != enemy):
-            row, col = divmod(index1 - 8 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(index1 - 8)
             posibble_moves.append(index1 - 8)
 
-        
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 - 7 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 - 7)
             posibble_moves.append(index1 - 7)
 
         not_allowed_positions = [0,8,16,24,32,40,48,56]
         if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions):
             
-            row, col = divmod(index1 - 9 , COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(index1 - 9)
             posibble_moves.append(index1 - 9)
 
         return posibble_moves
     
 
-    
-
-        
-
-
-
-
-    
     #Rook movement +y-y///+x-x
     elif var == "wR" or var == "bR": #board_pieces[index1] == var:#"wR"
         num = 8
@@ -327,20 +258,12 @@ def highlight_square(index1):
             if board_state[positive_y] == ally:
                 break
             if board_state[positive_y] == enemy:
-                row, col = divmod(positive_y, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-                screen.blit(highlight_surface, (x, y))
+                
+                highlighted_tile_color_position(positive_y)
                 posibble_moves.append(positive_y)
                 break
-            row, col = divmod(positive_y, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(positive_y)
             posibble_moves.append(positive_y)
 
         
@@ -350,20 +273,11 @@ def highlight_square(index1):
             if board_state[negative_y] == ally:
                 break
             if board_state[negative_y] == enemy:
-                row, col = divmod(negative_y, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)"""
-                screen.blit(highlight_surface, (x, y))
+                
+                highlighted_tile_color_position(negative_y)
                 posibble_moves.append(negative_y)
                 break
-            row, col = divmod(negative_y, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(negative_y)
             posibble_moves.append(negative_y)
         
 
@@ -374,20 +288,11 @@ def highlight_square(index1):
             if board_state[i] == ally:
                 break
             if board_state[i] == enemy:
-                row, col = divmod(i, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))
-                screen.blit(highlight_surface, (x, y))
+                
+                highlighted_tile_color_position(i)
                 posibble_moves.append(i)
                 break
-            row, col = divmod(i, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(i)
             posibble_moves.append(i)
         
         negative_x = index1
@@ -397,20 +302,12 @@ def highlight_square(index1):
             if board_state[i] == ally:
                 break
             if board_state[i] == enemy:
-                row, col = divmod(i, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))
-                screen.blit(highlight_surface, (x, y))
+
+                highlighted_tile_color_position(i)
                 posibble_moves.append(i)
                 break
-            row, col = divmod(i, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(i)
             posibble_moves.append(i)
 
         return posibble_moves
@@ -419,33 +316,21 @@ def highlight_square(index1):
     elif var == "wKnight" or var == "bKnight":#board_pieces[index1] == var:#"wKnight"
         far_right_up = index1 - 6
         if (far_right_up >= 0) and ((index1 // 8) != (far_right_up // 8)) and (board_state[far_right_up] != ally):
-            row, col = divmod(far_right_up, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(far_right_up)
             posibble_moves.append(far_right_up)
 
         mid_up_right = index1 - 15
         if (mid_up_right >= 0) and ((index1 // 8) >= (mid_up_right // 8) + 2) and (board_state[mid_up_right] != ally):
-            row, col = divmod(mid_up_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(mid_up_right)
             posibble_moves.append(mid_up_right)
 
         mid_up_left = index1 - 17
         not_allowed_positions = [24,32,40,48,56]
         if((mid_up_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_up_left] != ally)):
-            row, col = divmod(mid_up_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(mid_up_left)
             posibble_moves.append(mid_up_left)
 
         far_left_up = index1 - 10
@@ -456,12 +341,7 @@ def highlight_square(index1):
             41,48,49,56,57
             ]
         if((far_left_up >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_up] != ally)):
-            row, col = divmod(far_left_up, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(far_left_up)
             posibble_moves.append(far_left_up)
 
         far_left_down = index1 + 6
@@ -472,12 +352,7 @@ def highlight_square(index1):
             ]
         
         if((far_left_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_down] != ally)):
-            row, col = divmod(far_left_down, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(far_left_down)
             posibble_moves.append(far_left_down)
 
         mid_down_left = index1 + 15
@@ -488,12 +363,7 @@ def highlight_square(index1):
             61,62,63
         ] 
         if((mid_down_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_left] != ally)):
-            row, col = divmod(mid_down_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(mid_down_left)
             posibble_moves.append(mid_down_left)
 
 
@@ -506,12 +376,7 @@ def highlight_square(index1):
         ] 
 
         if((mid_down_right >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_right] != ally)):
-            row, col = divmod(mid_down_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(mid_down_right)
             posibble_moves.append(mid_down_right)
 
         far_right_down = index1 + 10
@@ -520,16 +385,11 @@ def highlight_square(index1):
             46,47,54,55,56,57,58,59,60,
             61,62,63
         ]
+
         if((far_right_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_right_down] != ally)):
-            row, col = divmod(far_right_down, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(far_right_down)
             posibble_moves.append(far_right_down)
-
-
 
         return posibble_moves
     
@@ -539,12 +399,8 @@ def highlight_square(index1):
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
         while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
-            row, col = divmod(top_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
 
             if board_state[top_right] == enemy:
@@ -556,12 +412,8 @@ def highlight_square(index1):
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
         while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
-            row, col = divmod(top_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
 
             if board_state[top_left] == enemy:
@@ -573,12 +425,8 @@ def highlight_square(index1):
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
         while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
-            row, col = divmod(bottom_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(bottom_left)
             posibble_moves.append(bottom_left)
 
             if board_state[bottom_left] == enemy:
@@ -590,12 +438,8 @@ def highlight_square(index1):
         bottom_right = index1 + 9
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
-            row, col = divmod(bottom_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
 
             if(board_state[bottom_right] == enemy):
@@ -610,29 +454,20 @@ def highlight_square(index1):
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
         while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
-            row, col = divmod(top_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
 
             if board_state[top_right] == enemy:
                 break
             top_right -= 7
 
-
         top_left = index1 - 9
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
         while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
-            row, col = divmod(top_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
 
             if board_state[top_left] == enemy:
@@ -644,12 +479,9 @@ def highlight_square(index1):
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
         while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
-            row, col = divmod(bottom_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            
+            highlighted_tile_color_position(bottom_left)
+
             posibble_moves.append(bottom_left)
 
             if board_state[bottom_left] == enemy:
@@ -657,14 +489,11 @@ def highlight_square(index1):
             bottom_left += 7
 
         bottom_right = index1 + 9
+
         not_allowed_positions = [7,15,23,31,39,47,55,63]
         while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
-            row, col = divmod(bottom_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
 
             if board_state[bottom_right] == enemy:
@@ -679,20 +508,12 @@ def highlight_square(index1):
             if board_state[positive_y] == ally:
                 break
             if board_state[positive_y] == enemy:
-                row, col = divmod(positive_y, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-                screen.blit(highlight_surface, (x, y))
+
+                highlighted_tile_color_position(positive_y)
                 posibble_moves.append(positive_y)
                 break
-            row, col = divmod(positive_y, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(positive_y)
             posibble_moves.append(positive_y)
 
         
@@ -702,175 +523,110 @@ def highlight_square(index1):
             if board_state[negative_y] == ally:
                 break
             if board_state[negative_y] == enemy:
-                row, col = divmod(negative_y, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))  # Yellow with 100 alpha (transparency)"""
-                screen.blit(highlight_surface, (x, y))
-                posibble_moves.append(negative_y)
+
+                highlighted_tile_color_position(negative_y)
                 break
-            row, col = divmod(negative_y, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(negative_y)
             posibble_moves.append(negative_y)
         
 
         positive_x = index1
         upper_bound = (positive_x // 8) * 8 + 7
         start_value = positive_x + 1
+
         for i in range(start_value, upper_bound + 1):
             if board_state[i] == ally:
                 break
             if board_state[i] == enemy:
-                row, col = divmod(i, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))
-                screen.blit(highlight_surface, (x, y))
+
+                highlighted_tile_color_position(i)
                 posibble_moves.append(i)
                 break
-            row, col = divmod(i, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(i)
             posibble_moves.append(i)
         
+
         negative_x = index1
         lower_bound = (negative_x // 8) * 8 
         start_value = negative_x - 1
+
         for i in range(start_value, lower_bound - 1, -1):
             if board_state[i] == ally:
                 break
             if board_state[i] == enemy:
-                row, col = divmod(i, COLS)
-                x = MARGIN_X + col * SQUARE_SIZE
-                y = MARGIN_Y + row * SQUARE_SIZE
-                highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-                highlight_surface.fill((255, 255, 0, 100))
-                screen.blit(highlight_surface, (x, y))
+                highlighted_tile_color_position(i)
                 posibble_moves.append(i)
+
                 break
-            row, col = divmod(i, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+            highlighted_tile_color_position(i)
             posibble_moves.append(i)
 
         return posibble_moves
     
     #king movement
-    elif var == "wK" or var == "bK":#board_pieces[index1] == var:#"wK"
+    elif var == "wK" or var == "bK":
 
         top = index1 - 8
         not_allowed_positions = [0,1,2,3,4,5,6,7]
         if(board_state[top] != ally) and (index1 not in not_allowed_positions):
-            row, col = divmod(top, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(top)
             posibble_moves.append(top)
 
         top_left = index1 - 9
         not_allowed_positions = [0,1,2,3,4,5,6,7,8,16,24,32,40,48, 56]
         if (board_state[top_left] != ally) and (index1 not in not_allowed_positions):
-            row, col = divmod(top_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
 
         left = index1 - 1
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
         if (board_state[left] != ally) and (index1 not in not_allowed_positions):
-            row, col = divmod(left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+
+            highlighted_tile_color_position(left)
             posibble_moves.append(left)
 
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48, 56,57,58,59,60,61,62,63]
-        if(bottom_left <= 63) and (board_state[bottom_left] != ally) and (index1 not in not_allowed_positions) :
-            row, col = divmod(bottom_left, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+        if(bottom_left <= 63) and (board_state[bottom_left] != ally) and (index1 not in not_allowed_positions):
+
+            highlighted_tile_color_position(bottom_left)
             posibble_moves.append(bottom_left)
 
         bottom = index1 + 8
         not_allowed_positions = [56,57,58,59,60,61,62,63]
-        if(bottom <= 63) and (board_state[bottom] != ally) and (index1 not in not_allowed_positions) :
-            row, col = divmod(bottom, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+        if(bottom <= 63) and (board_state[bottom] != ally) and (index1 not in not_allowed_positions):
+
+            highlighted_tile_color_position(bottom)
             posibble_moves.append(bottom)
 
         bottom_right = index1 + 9
         not_allowed_positions = [56,57,58,59,60,61,62,63,7,15,23,31,39,47,55]
-        if(bottom_right <= 63) and (board_state[bottom_right] != ally) and (index1 not in not_allowed_positions) :
-            row, col = divmod(bottom_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+        if(bottom_right <= 63) and (board_state[bottom_right] != ally) and (index1 not in not_allowed_positions):
+
+            highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
 
         right = index1 + 1
         not_allowed_positions = [63,7,15,23,31,39,47,55]
-        if(right <= 63) and (board_state[right] != ally) and (index1 not in not_allowed_positions) :
-            row, col = divmod(right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+        if(right <= 63) and (board_state[right] != ally) and (index1 not in not_allowed_positions):
+
+            highlighted_tile_color_position(right)
             posibble_moves.append(right)
 
         top_right = index1 - 7
         not_allowed_positions = [63,7,15,23,31,39,47,55,0,1,2,3,4,5,6,7]
-        if(top_right >= 0) and (board_state[top_right] != ally) and (index1 not in not_allowed_positions) :
-            row, col = divmod(top_right, COLS)
-            x = MARGIN_X + col * SQUARE_SIZE
-            y = MARGIN_Y + row * SQUARE_SIZE
-            highlight_surface = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE), pygame.SRCALPHA)
-            highlight_surface.fill((255, 255, 0, 100))
-            screen.blit(highlight_surface, (x, y))
+        if(top_right >= 0) and (board_state[top_right] != ally) and (index1 not in not_allowed_positions):
+
+            highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
-    
     
     else:
         posibble_moves.append(-1)
     return posibble_moves
-
-
-
-
-
-
-
-
- 
 
 
 # Main loop
@@ -883,7 +639,6 @@ def main():
 
     test = []
     first_move_bool = True
-    global highlighted_square
 
     while running:
         for event in pygame.event.get():
@@ -893,14 +648,9 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     running = False
 
-
-
-
             elif event.type == pygame.MOUSEBUTTONDOWN:  # Mouse click event
-                #most beuatiful algorithm i have ever written
                 #it gets first click and stores it in index1
                 #then it checks if index1 is in the board boundaries if not it will wait till the user clicks on the board
-
 
                 if first_move_bool:
                     index1 = user_click_position(event.pos)
@@ -935,9 +685,6 @@ def main():
                         draw_board()
                         draw_pieces()
                         first_move_bool = True
-
-
-
 
         # Update the display
         pygame.display.flip()
