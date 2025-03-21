@@ -518,19 +518,21 @@ def highlight_square(index1):
 
         
         negative_y = index1
-        while negative_y < 64 and (negative_y + 8 < 64):
+        while negative_y < 64 and (negative_y + 8 < 64):#****************************************#
             negative_y += num
             if board_state[negative_y] == ally:
                 break
             if board_state[negative_y] == enemy:
 
                 highlighted_tile_color_position(negative_y)
+                posibble_moves.append(negative_y)
+
                 break
 
             highlighted_tile_color_position(negative_y)
             posibble_moves.append(negative_y)
         
-
+        
         positive_x = index1
         upper_bound = (positive_x // 8) * 8 + 7
         start_value = positive_x + 1
