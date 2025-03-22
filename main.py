@@ -21,15 +21,16 @@ HIGHLIGHT = (200, 200, 50)  # Yellow highlight
 BG_COLOR = (50, 50, 50)
 
 # if value is 1 then its acccupied by white pieces if 2 then black pieces if 0 then empty
+# 3 for kings either white king or black king
 board_state = [
-    2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
+    2 , 2 , 2 , 2 , 3 , 2 , 2 , 2 ,
     2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ,
     1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
-    1 , 1 , 1 , 1 , 1 , 1 , 1 , 1  ]
+    1 , 1 , 1 , 1 , 3 , 1 , 1 , 1  ]
 
 
 # the game in string format stored in the list                          
@@ -39,7 +40,7 @@ board_pieces = [
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
     "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0" ,
-    "0" ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0"  ,
+    "0"  ,     "0"   ,  "0" ,  "0" ,  "0" ,  "0" ,     "0"   ,  "0"  ,
     "wP" ,    "wP"   , "wP" , "wP" , "wP" , "wP" ,    "wP"   , "wP" ,
     "wR" , "wKnight" , "wB" , "wQ" , "wK" , "wB" , "wKnight" , "wR" 
     ]
@@ -169,13 +170,13 @@ def highlight_square(index1):
             posibble_moves.append(target_index)
 
         not_allowed_positions = [0,8,16,24,32,40,48,56]
-        if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions):
+        if (index1 + 7 <= 63) and (board_state[index1 + 7] == enemy) and (index1 not in not_allowed_positions) and (board_state[index1 + 7] != 3):
             
             highlighted_tile_color_position(index1 + 7)
             posibble_moves.append(index1 + 7)
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions):
+        if (index1 + 9 <= 63) and (board_state[index1 + 9] == enemy) and (index1 not in not_allowed_positions) and (board_state[index1 + 9] != 3):
             
             highlighted_tile_color_position(index1 + 9)
             posibble_moves.append(index1 + 9)
@@ -214,13 +215,13 @@ def highlight_square(index1):
             posibble_moves.append(target_index)
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions):
+        if (index1 - 7 >= 0) and (board_state[index1 - 7] == enemy) and (index1 not in not_allowed_positions) and (board_state[index1 - 7] != 3):
             
             highlighted_tile_color_position(index1 - 7)
             posibble_moves.append(index1 - 7)
 
         not_allowed_positions = [0,8,16,24,32,40,48,56]
-        if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions):
+        if (index1 - 9 >= 0) and (board_state[index1 - 9] == enemy) and (index1 not in not_allowed_positions) and (board_state[index1 - 9] != 3):
             
             highlighted_tile_color_position(index1 - 9)
             posibble_moves.append(index1 - 9)
@@ -249,11 +250,15 @@ def highlight_square(index1):
         return posibble_moves
     
 
+
+#white pawns are done now off to Rook 
+
+
     #Rook movement +y-y///+x-x
     elif var == "wR" or var == "bR": #board_pieces[index1] == var:#"wR"
         num = 8
         positive_y = index1
-        while positive_y >= 0 and (positive_y - 8 >= 0):
+        while (positive_y >= 0) and (positive_y - 8 >= 0) and (board_state[positive_y - 8] != 3):
             positive_y -= num
             if board_state[positive_y] == ally:
                 break
@@ -268,7 +273,7 @@ def highlight_square(index1):
 
         
         negative_y = index1
-        while negative_y < 64 and (negative_y + 8 < 64):
+        while (negative_y < 64) and (negative_y + 8 < 64) and (board_state[negative_y + 8] != 3):
             negative_y += num
             if board_state[negative_y] == ally:
                 break
@@ -285,8 +290,9 @@ def highlight_square(index1):
         upper_bound = (positive_x // 8) * 8 + 7
         start_value = positive_x + 1
         for i in range(start_value, upper_bound + 1):
-            if board_state[i] == ally:
+            if board_state[i] == ally or board_state[i] == 3:
                 break
+
             if board_state[i] == enemy:
                 
                 highlighted_tile_color_position(i)
@@ -299,8 +305,9 @@ def highlight_square(index1):
         lower_bound = (negative_x // 8) * 8 
         start_value = negative_x - 1
         for i in range(start_value, lower_bound - 1, -1):
-            if board_state[i] == ally:
+            if board_state[i] == ally or board_state[i] == 3:
                 break
+
             if board_state[i] == enemy:
 
                 highlighted_tile_color_position(i)
@@ -313,22 +320,22 @@ def highlight_square(index1):
         return posibble_moves
 
     #knight movement
-    elif var == "wKnight" or var == "bKnight":#board_pieces[index1] == var:#"wKnight"
+    elif var == "wKnight" or var == "bKnight":
         far_right_up = index1 - 6
-        if (far_right_up >= 0) and ((index1 // 8) != (far_right_up // 8)) and (board_state[far_right_up] != ally):
+        if (far_right_up >= 0) and ((index1 // 8) != (far_right_up // 8)) and (board_state[far_right_up] != ally) and (board_state[far_right_up] != 3):
             
             highlighted_tile_color_position(far_right_up)
             posibble_moves.append(far_right_up)
 
         mid_up_right = index1 - 15
-        if (mid_up_right >= 0) and ((index1 // 8) >= (mid_up_right // 8) + 2) and (board_state[mid_up_right] != ally):
+        if (mid_up_right >= 0) and ((index1 // 8) >= (mid_up_right // 8) + 2) and (board_state[mid_up_right] != ally) and (board_state[mid_up_right] != 3):
             
             highlighted_tile_color_position(mid_up_right)
             posibble_moves.append(mid_up_right)
 
         mid_up_left = index1 - 17
         not_allowed_positions = [24,32,40,48,56]
-        if((mid_up_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_up_left] != ally)):
+        if((mid_up_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_up_left] != ally) and (board_state[mid_up_left] != 3)):
             
             highlighted_tile_color_position(mid_up_left)
             posibble_moves.append(mid_up_left)
@@ -340,7 +347,7 @@ def highlight_square(index1):
             32,33,40,
             41,48,49,56,57
             ]
-        if((far_left_up >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_up] != ally)):
+        if((far_left_up >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_up] != ally) and (board_state[far_left_up] != 3)):
             highlighted_tile_color_position(far_left_up)
             posibble_moves.append(far_left_up)
 
@@ -351,7 +358,7 @@ def highlight_square(index1):
             57,58,59,60,61,62,63
             ]
         
-        if((far_left_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_down] != ally)):
+        if((far_left_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_left_down] != ally) and (board_state[far_left_down] != 3)):
             highlighted_tile_color_position(far_left_down)
             posibble_moves.append(far_left_down)
 
@@ -362,7 +369,7 @@ def highlight_square(index1):
             54,55,57,58,59,60,
             61,62,63
         ] 
-        if((mid_down_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_left] != ally)):
+        if((mid_down_left >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_left] != ally) and (board_state[mid_down_left] != 3)):
             highlighted_tile_color_position(mid_down_left)
             posibble_moves.append(mid_down_left)
 
@@ -375,7 +382,7 @@ def highlight_square(index1):
             61,62,63
         ] 
 
-        if((mid_down_right >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_right] != ally)):
+        if((mid_down_right >= 0) and (index1 not in not_allowed_positions) and (board_state[mid_down_right] != ally) and (board_state[mid_down_right] != 3)):
             highlighted_tile_color_position(mid_down_right)
             posibble_moves.append(mid_down_right)
 
@@ -386,7 +393,7 @@ def highlight_square(index1):
             61,62,63
         ]
 
-        if((far_right_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_right_down] != ally)):
+        if((far_right_down >= 0) and (index1 not in not_allowed_positions) and (board_state[far_right_down] != ally) and (board_state[far_right_down] != 3)):
             
             highlighted_tile_color_position(far_right_down)
             posibble_moves.append(far_right_down)
@@ -394,24 +401,25 @@ def highlight_square(index1):
         return posibble_moves
     
     #bishop movement
-    elif var == "wB" or var == "bB": # board_pieces[index1] == var:#"wB"
+    elif var == "wB" or var == "bB":
         top_right = index1 - 7
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
-        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
+        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)) and (board_state[top_right] != 3):
             
             highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
 
             if board_state[top_right] == enemy:
                 break
+            
             top_right -= 7
 
 
         top_left = index1 - 9
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
-        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
+        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)) and (board_state[top_left] != 3):
             
             highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
@@ -424,7 +432,7 @@ def highlight_square(index1):
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
-        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
+        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)) and (board_state[bottom_left] != 3):
             
             highlighted_tile_color_position(bottom_left)
             posibble_moves.append(bottom_left)
@@ -437,7 +445,7 @@ def highlight_square(index1):
         # this is what is breaking the program
         bottom_right = index1 + 9
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
+        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)) and (board_state[bottom_right] != 3):
             
             highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
@@ -448,12 +456,12 @@ def highlight_square(index1):
             bottom_right += 9
 
     #queen movement
-    elif var == "wQ" or var == "bQ":#board_pieces[index1] == var:#"wQ"
+    elif var == "wQ" or var == "bQ":
 
         top_right = index1 - 7
         not_allowed_positions = [7,15,23,31,39,47,55,63]
 
-        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)):
+        while((top_right >= 0) and((top_right + 7) not in not_allowed_positions) and(board_state[top_right] != ally)) and (board_state[top_right] != 3):
             
             highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
@@ -465,7 +473,7 @@ def highlight_square(index1):
         top_left = index1 - 9
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
 
-        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)):
+        while((top_left >= 0) and((top_left + 9) not in not_allowed_positions) and(board_state[top_left] != ally)) and (board_state[top_left] != 3):
 
             highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
@@ -478,7 +486,7 @@ def highlight_square(index1):
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48,56]
 
-        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)):
+        while((bottom_left <= 63) and((bottom_left - 7 ) not in not_allowed_positions) and(board_state[bottom_left] != ally)) and (board_state[bottom_left] != 3):
             
             highlighted_tile_color_position(bottom_left)
 
@@ -491,7 +499,7 @@ def highlight_square(index1):
         bottom_right = index1 + 9
 
         not_allowed_positions = [7,15,23,31,39,47,55,63]
-        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)):
+        while((bottom_right <= 63) and((bottom_right - 9 ) not in not_allowed_positions) and(board_state[bottom_right] != ally)) and (board_state[bottom_right] != 3):
 
             highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
@@ -503,7 +511,7 @@ def highlight_square(index1):
 
         num = 8
         positive_y = index1
-        while positive_y >= 0 and (positive_y - 8 >= 0):
+        while positive_y >= 0 and (positive_y - 8 >= 0) and (board_state[positive_y - 8] != 3):
             positive_y -= num
             if board_state[positive_y] == ally:
                 break
@@ -518,7 +526,7 @@ def highlight_square(index1):
 
         
         negative_y = index1
-        while negative_y < 64 and (negative_y + 8 < 64):#****************************************#
+        while negative_y < 64 and (negative_y + 8 < 64) and (board_state[negative_y + 8] != 3):
             negative_y += num
             if board_state[negative_y] == ally:
                 break
@@ -538,8 +546,9 @@ def highlight_square(index1):
         start_value = positive_x + 1
 
         for i in range(start_value, upper_bound + 1):
-            if board_state[i] == ally:
+            if board_state[i] == ally or board_state[i] == 3:
                 break
+            
             if board_state[i] == enemy:
 
                 highlighted_tile_color_position(i)
@@ -555,8 +564,9 @@ def highlight_square(index1):
         start_value = negative_x - 1
 
         for i in range(start_value, lower_bound - 1, -1):
-            if board_state[i] == ally:
+            if board_state[i] == ally or board_state[i] == 3:
                 break
+
             if board_state[i] == enemy:
                 highlighted_tile_color_position(i)
                 posibble_moves.append(i)
@@ -572,56 +582,56 @@ def highlight_square(index1):
 
         top = index1 - 8
         not_allowed_positions = [0,1,2,3,4,5,6,7]
-        if(board_state[top] != ally) and (index1 not in not_allowed_positions):
+        if(board_state[top] != ally) and (index1 not in not_allowed_positions) and (board_state[top] != 3):
 
             highlighted_tile_color_position(top)
             posibble_moves.append(top)
 
         top_left = index1 - 9
         not_allowed_positions = [0,1,2,3,4,5,6,7,8,16,24,32,40,48, 56]
-        if (board_state[top_left] != ally) and (index1 not in not_allowed_positions):
+        if (board_state[top_left] != ally) and (index1 not in not_allowed_positions) and (board_state[top_left] != 3):
 
             highlighted_tile_color_position(top_left)
             posibble_moves.append(top_left)
 
         left = index1 - 1
         not_allowed_positions = [0,8,16,24,32,40,48, 56]
-        if (board_state[left] != ally) and (index1 not in not_allowed_positions):
+        if (board_state[left] != ally) and (index1 not in not_allowed_positions) and (board_state[left] != 3):
 
             highlighted_tile_color_position(left)
             posibble_moves.append(left)
 
         bottom_left = index1 + 7
         not_allowed_positions = [0,8,16,24,32,40,48, 56,57,58,59,60,61,62,63]
-        if(bottom_left <= 63) and (board_state[bottom_left] != ally) and (index1 not in not_allowed_positions):
+        if(bottom_left <= 63) and (board_state[bottom_left] != ally) and (index1 not in not_allowed_positions) and (board_state[bottom_left] != 3):
 
             highlighted_tile_color_position(bottom_left)
             posibble_moves.append(bottom_left)
 
         bottom = index1 + 8
         not_allowed_positions = [56,57,58,59,60,61,62,63]
-        if(bottom <= 63) and (board_state[bottom] != ally) and (index1 not in not_allowed_positions):
+        if(bottom <= 63) and (board_state[bottom] != ally) and (index1 not in not_allowed_positions) and (board_state[bottom] != 3):
 
             highlighted_tile_color_position(bottom)
             posibble_moves.append(bottom)
 
         bottom_right = index1 + 9
         not_allowed_positions = [56,57,58,59,60,61,62,63,7,15,23,31,39,47,55]
-        if(bottom_right <= 63) and (board_state[bottom_right] != ally) and (index1 not in not_allowed_positions):
+        if(bottom_right <= 63) and (board_state[bottom_right] != ally) and (index1 not in not_allowed_positions) and (board_state[bottom_right] != 3):
 
             highlighted_tile_color_position(bottom_right)
             posibble_moves.append(bottom_right)
 
         right = index1 + 1
         not_allowed_positions = [63,7,15,23,31,39,47,55]
-        if(right <= 63) and (board_state[right] != ally) and (index1 not in not_allowed_positions):
+        if(right <= 63) and (board_state[right] != ally) and (index1 not in not_allowed_positions) and (board_state[right] != 3):
 
             highlighted_tile_color_position(right)
             posibble_moves.append(right)
 
         top_right = index1 - 7
         not_allowed_positions = [63,7,15,23,31,39,47,55,0,1,2,3,4,5,6,7]
-        if(top_right >= 0) and (board_state[top_right] != ally) and (index1 not in not_allowed_positions):
+        if(top_right >= 0) and (board_state[top_right] != ally) and (index1 not in not_allowed_positions) and (board_state[top_right] != 3):
 
             highlighted_tile_color_position(top_right)
             posibble_moves.append(top_right)
